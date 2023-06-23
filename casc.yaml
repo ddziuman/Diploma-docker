@@ -1,0 +1,132 @@
+jenkins:
+  nodes:
+    - permanent:
+        name: "frontendNode"
+        remoteFS: "/home/ubuntu/jenkins"
+        mode: EXCLUSIVE       
+        launcher:
+          SSHLauncher:
+            host: "44.211.190.248"
+            port: "22"
+            credentialsId: awsKey
+            sshHostKeyVerificationStrategy: 'nonVerifyingKeyVerificationStrategy'
+    - permanent:
+        name: "backendNode"
+        remoteFS: "/home/ubuntu/jenkins"
+        mode: EXCLUSIVE
+        launcher:
+          SSHLauncher:
+            host: "3.84.57.61"
+            port: "22"
+            credentialsId: awsKey
+            sshHostKeyVerificationStrategy: 'nonVerifyingKeyVerificationStrategy'
+                     
+  securityRealm:
+    local:
+      allowsSignup: true
+      users:
+        - id: admin
+          password: admin
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+jobs:
+  - script: >
+      pipelineJob('buildFrontend') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/Soluyankp91/Diploma-frontend')
+                  credentials('repoPass')
+                  }
+                branch('*/master')
+                }
+              }
+              lightweight()
+            }
+          }
+        }
+  - script: >
+      pipelineJob('buildBackend') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/Soluyankp91/Diploma-backend')
+                  credentials('repoPass')
+                  }
+                branch('*/master')
+                }
+              }
+              lightweight()
+            }
+          }
+        }  
+tool:
+  nodejs:
+    installations:
+      - name: "nodejs"
+        home: ""
+        properties:
+         - installSource:
+            installers:
+              - nodeJSInstaller:
+                  id: '18.15.0'
+                  npmPackages: ""
+                  npmPackagesRefreshHours: 72
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: GLOBAL
+              id: repoPass
+              username: repoPass
+              password: "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"
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: awsKey
+              username: ubuntu
+              privateKeySource:
+                directEntry:
+                  privateKey: "-----BEGIN RSA PRIVATE KEY-----
+
+MIIEpAIBAAKCAQEAooXifBf++7CJqCPOlT421b8TX8uDhzYE8zF4+QP2ZwpQhpfs
+la0si/OxFKCo+vsFet8hI5nQBUS2BiHJcqsvRdv+NeQzp23RAG9lqUss2rxTFL4k
+Y6T0welinC2+JyYTyrJ/++JUOQmVNthk94f4SOkTqF+nW4CJADyujjjv85gdh2nN
+FZeEaOv07fEu32A5tRpWoessCCcukZQeAy9UlE/JNpbv14oxMw5cY9V1UzMVLRMg
+vXcWbJ5Yy0Iirt+nL0A0AsN1NUPuqaev/FI4iFiOc2u2KPSFlI62W0JD+sHOxIty
+wHpKp6DS0boFFXJqsx02WvbBE5pyqaKPW9eOWwIDAQABAoIBAEoQ7/2Txf2YH7QD
+1YLIXp8cvEyc5+033huiwTni52lgFwCvvf8cc7+4KEx5R2lR+tZbV7PsxhOQk8/J
+mA/tGdchggG3ZR75ehVTryXu/5sT1l0OpnDO3Uh9/xWj9xPKU5y9qnv1UmLIDjt3
+dNQmIC3CItZJ+XBG7Kix/u8L3bbKL7yt1dmEaPHt7v2f1uTJSqjFS/j7xY8d/LgQ
+EkbOugkLmgeyFf+dNB+Aj6ppBDWq+db0QSFXkgEMr1LnKfGtxlRPFt7+fskLV00B
+WjlgUW/pfJSKKwX9ZvOu7CNQjGa7wrqQKS8XD9We09Jdr2eW3M3q979QqmZ9Wt7J
+osfluzECgYEA9+KwboHKdX0L0MjErCOmjSky04/UvqJ3iYggbpohqbLmJOMVPShw
+syTAyCfy7neFSpPviDUFRCzhiRCLl/mpgVZi7cuRDqglNJz/jP9yhHaHEshkKEkN
+L3334SuxHDz6jO5QonoMWLcEnlWTLWQ3DY0Ukfy5HYV/ip/H0KzsmMkCgYEAp9fY
+4bc5XslByVgj9esHZSEu3KoV0pvEPAMPOeyUmUkYON+YcuymCe8Y931+GYiR083t
+2CK/kaIJSBvSc47bcigwPkTu/11rYsO8H4BnpXZKx8XRLD7r+4Fy9phG8EG0+Hak
+p5FVDfiKo3k3SvujKMnGHT9JQWdHcKFJ13MppAMCgYEAsRRWl0rOt6lxpF+X56S8
+GQFCVtHb16c2H6CIEpq2y4SKVfWGuZ7HC6KIuTOYnnPxWzpdFf9SWMZ7AzA3mIR4
+a3WrzFXstPy3P2OcRzxAsZH+ohNXQVQWQEQLrOZKanLBRaYFIlxvr3xmpzlYn0eE
+8IBFHpjcINO6LexAkLjHd8kCgYB1igP49b34cgpe/RmZ0vCH0rglkfrcVXcT67ST
+BOl/ex+6XGM/QBh65nTehIR1Tx2IbTL95D+xtf63/7vebxGgnSJDyTRxorNcI+Sv
+TtXGmtN9mTuFt768j4e5xyQOhoU8ZqGiM3WT5hT4rB+bpCM7oinaO4KKidAOwPSc
+K6rijwKBgQCV0/WfPifK65EV8GvtMkdjZLKwc79E7BWc2ccl09h9r9qwEK/mGqOL
+PnGx2uGOsAJVpDSCN/hf0NBxtiUJDQdfiUnDzoa1DSy+WiDQjOLfeqCwtLQe5WXR
+gBxhv6HtrToDWL6V5soLTUr0EkeeZ42Zg6pWJnqDpzjAdIoGaVrkSw==
+
+-----END RSA PRIVATE KEY-----"           
+security:
+  queueItemAuthenticator:
+    authenticators:
+    - global:
+        strategy: triggeringUsersAuthorizationStrategy
+unclassified:
+  location:
+    url: http://localhost:8080/
